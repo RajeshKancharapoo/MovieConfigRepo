@@ -1,0 +1,38 @@
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+spring:
+  main:
+    allow-circular-references: 'true'
+  cloud:
+    gateway:
+      routes[2]:
+        uri: lb://MOVIE-SERVICE
+        filters[0]: AuthenticationFilter
+        id: movies
+        predicates[0]: Path=/api/v1/movies/**
+      routes[0]:
+        id: user
+        filters[0]: AuthenticationFilter
+        uri: lb://USER-SERVICE
+        predicates[0]: Path=/api/v1/user/**
+      routes[3]:
+        id: booking
+        predicates[0]: Path=/api/v1/booking/**
+        filters[0]: AuthenticationFilter
+        uri: lb://BOOKING-SERVICE
+      routes[1]:
+        id: auth
+        predicates[0]: Path=/jwt/**
+        uri: lb://JWTAUTH-SERVICE
+      routes[4]:
+        uri: lb://THEATRE-SERVICE
+        id: theatre
+        predicates[0]: Path=/api/v1/theatre/**
+        filters[0]: AuthenticationFilter
+  application:
+    name: api-gateway
+server:
+  port: 9191
